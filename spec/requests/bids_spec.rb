@@ -32,3 +32,25 @@ describe 'Minimum Bids' do
     end
   end
 end
+
+describe 'Only one default bid present' do
+  describe 'GET /bids' do
+    before do
+      create(:bid, country: '*', category: '*', channel: '*', amount: 1.0)
+    end
+
+    it 'returns the same amount for all bid combinations' do
+      get '/bids', params: { countries: 'us', categories: 'finance', channels: 'ca,ga' }
+
+      expect(response).to have_http_status(:ok)
+
+      bids_response = response.parsed_body['bids']
+      expect(bids_response).to match_array(
+        [
+          { 'country' => 'us', 'category' => 'finance', 'channel' => 'ca', 'amount' => '1.0' },
+          { 'country' => 'us', 'category' => 'finance', 'channel' => 'ga', 'amount' => '1.0' }
+        ]
+      )
+    end
+  end
+end
