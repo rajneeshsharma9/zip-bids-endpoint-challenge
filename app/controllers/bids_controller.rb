@@ -4,9 +4,7 @@ class BidsController < ApplicationController
     countries = params[:countries]&.split(',') || []
     categories = params[:categories]&.split(',') || []
     channels = params[:channels]&.split(',') || []
-
     combinations = countries.product(categories).product(channels).map(&:flatten)
-
     bids = []
 
     if combinations.present?
@@ -17,7 +15,7 @@ class BidsController < ApplicationController
         category_bids = category_bids(country_bids, category)
         bid = category_bids.find_by(channel: channel) || category_bids.find_by(channel: '*') || country_bids.find_by(category: '*', channel: '*')
 
-        bid = default_bid unless bid
+        bid = Bid.default.first unless bid
 
         bids << { 'country': country, 'category': category, channel: channel, 'amount': bid.amount } if bid
       end
@@ -38,10 +36,6 @@ class BidsController < ApplicationController
     category_bids = country_bids.where(category: category)
     category_bids = country_bids.where(category: '*') if category_bids.blank?
     category_bids
-  end
-
-  def default_bid
-    @default_bid ||= Bid.find_by(country: '*', category: '*', channel: '*')
   end
 
 end

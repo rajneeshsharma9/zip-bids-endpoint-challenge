@@ -5,6 +5,9 @@ class Bid < ApplicationRecord
   # Callbacks
   before_save :set_defaults
 
+  # Scopes
+  scope :default, -> { where(country: '*', category: '*', channel: '*') }
+
   # Validations
   validates :amount, presence: true
   validates :amount, numericality: { greater_than: 0 }, allow_blank: true
